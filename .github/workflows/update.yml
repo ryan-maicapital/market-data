@@ -28,7 +28,7 @@ jobs:
       - name: Get Forex Data
         run: |
           response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/global/market/fx/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
-          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > forex/${{ env.DATE }}.json && jq ".forex = \"${{ env.DATE }}\"" <<<$(cat latest.json) >status.json
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > forex/${{ env.DATE }}.json && jq ".forex = \"${{ env.DATE }}\"" <<<$(cat status.json) >status.json
 
       - name: Get Crypto Data
         run: |
