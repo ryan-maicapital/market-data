@@ -1,0 +1,44 @@
+name: Add Data
+
+on:
+#  push:
+#  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+env:
+  POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+  DATE: $(date -d '-1 day' +'%Y-%m-%d')
+
+jobs:
+  data:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Get Stock Data
+        run: |
+          response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > stock/${{ env.DATE }}.json && jq ".stock = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+
+      - name: Get Forex Data
+        run: |
+          response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/global/market/fx/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > forex/${{ env.DATE }}.json && jq ".forex = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+
+      - name: Get Crypto Data
+        run: |
+          response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/global/market/crypto/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > crypto/${{ env.DATE }}.json && jq ".crypto = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Add Data
+          branch: master
+          commit_user_name: Data 🤖
+          commit_user_email: ryan@maicapital.io
+          commit_author: Data 🤖 <ryan@maicapital.io>
