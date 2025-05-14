@@ -23,17 +23,17 @@ jobs:
       - name: Get Stock Data
         run: |
           response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
-          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > stock/${{ env.DATE }}.json && jq ".stock = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > stock/${{ env.DATE }}.json && jq ".stock = \"${{ env.DATE }}\"" <<<$(cat status.json) >status.json
 
       - name: Get Forex Data
         run: |
           response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/global/market/fx/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
-          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > forex/${{ env.DATE }}.json && jq ".forex = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > forex/${{ env.DATE }}.json && jq ".forex = \"${{ env.DATE }}\"" <<<$(cat latest.json) >status.json
 
       - name: Get Crypto Data
         run: |
           response=$(curl -s -X GET "https://api.polygon.io/v2/aggs/grouped/locale/global/market/crypto/${{ env.DATE }}?adjusted=true&apiKey=${{ env.POLYGON_API_KEY }}")
-          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > crypto/${{ env.DATE }}.json && jq ".crypto = \"${{ env.DATE }}\"" <<<$(cat latest.json) >latest.json
+          [[ "$(echo $response | jq '.["status"]')" == "\"OK\"" ]] && echo $response > crypto/${{ env.DATE }}.json && jq ".crypto = \"${{ env.DATE }}\"" <<<$(cat status.json) >status.json
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
